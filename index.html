@@ -646,6 +646,271 @@
     ::-webkit-scrollbar-thumb:hover { background:var(--cyan); }
 
     /* ============================================================
+       ADMIN PANEL
+    ============================================================ */
+    .admin-overlay {
+      position:fixed; inset:0; background:rgba(0,0,0,.75);
+      backdrop-filter:blur(8px); z-index:9000;
+      opacity:0; pointer-events:none; transition:opacity .35s var(--ease);
+    }
+    .admin-overlay.open { opacity:1; pointer-events:all; }
+
+    .admin-panel {
+      position:fixed; inset:0; z-index:9001;
+      background:var(--bg); overflow-y:auto;
+      transform:translateY(30px); opacity:0; pointer-events:none;
+      transition:transform .45s var(--ease), opacity .35s var(--ease);
+    }
+    .admin-panel.open { transform:translateY(0); opacity:1; pointer-events:all; }
+
+    /* Admin login screen */
+    .admin-login {
+      min-height:100vh; display:flex; align-items:center; justify-content:center;
+      flex-direction:column; gap:2rem;
+    }
+    .admin-login-box {
+      background:var(--bg2); border:1px solid var(--border); border-radius:var(--r2);
+      padding:3rem 2.5rem; width:100%; max-width:380px; text-align:center;
+    }
+    .admin-login-logo {
+      font-family:var(--font-d); font-size:1.1rem; font-weight:700; letter-spacing:.35em;
+      background:var(--grad); -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+      margin-bottom:.4rem;
+    }
+    .admin-login-sub {
+      font-family:var(--font-m); font-size:.6rem; color:var(--text3);
+      letter-spacing:.2em; text-transform:uppercase; margin-bottom:2.2rem;
+    }
+    .admin-input {
+      width:100%; padding:.82rem 1.2rem; background:var(--bg3);
+      border:1px solid var(--border); border-radius:var(--r); color:var(--text);
+      font-size:.88rem; outline:none; transition:border-color .3s; margin-bottom:1rem;
+      font-family:var(--font-b);
+    }
+    .admin-input:focus { border-color:var(--border-glow); }
+    .admin-input::placeholder { color:var(--text3); }
+    .admin-login-err {
+      font-family:var(--font-m); font-size:.65rem; color:#ff4466;
+      letter-spacing:.1em; margin-bottom:.8rem; min-height:1rem;
+    }
+
+    /* Admin layout */
+    .admin-wrap { display:flex; min-height:100vh; }
+
+    .admin-sidebar {
+      width:240px; flex-shrink:0; background:var(--bg2);
+      border-right:1px solid var(--border); padding:2rem 0;
+      display:flex; flex-direction:column; position:sticky; top:0; height:100vh;
+    }
+    .admin-sidebar-logo {
+      font-family:var(--font-d); font-size:.9rem; font-weight:700; letter-spacing:.3em;
+      background:var(--grad); -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+      padding:0 1.6rem; margin-bottom:.3rem;
+    }
+    .admin-sidebar-tag {
+      font-family:var(--font-m); font-size:.55rem; color:var(--text3);
+      letter-spacing:.2em; padding:0 1.6rem; margin-bottom:2.2rem;
+    }
+    .admin-nav { list-style:none; flex:1; }
+    .admin-nav li { }
+    .admin-nav-btn {
+      width:100%; text-align:left; padding:.82rem 1.6rem; display:flex;
+      align-items:center; gap:.75rem; font-size:.78rem; font-weight:500;
+      letter-spacing:.04em; color:var(--text2); border-radius:0;
+      transition:all .22s; cursor:pointer; background:none; border:none;
+    }
+    .admin-nav-btn:hover { color:var(--text); background:var(--card); }
+    .admin-nav-btn.active {
+      color:var(--cyan); background:var(--cyan-dim); border-right:2px solid var(--cyan);
+    }
+    .admin-nav-icon { font-size:1rem; width:20px; text-align:center; }
+    .admin-sidebar-foot {
+      padding:1.5rem 1.6rem; border-top:1px solid var(--border);
+    }
+    .admin-logout-btn {
+      width:100%; padding:.65rem 1rem; background:transparent;
+      border:1px solid var(--border); border-radius:var(--r);
+      color:var(--text3); font-size:.75rem; letter-spacing:.08em;
+      cursor:pointer; transition:all .22s; font-family:var(--font-b);
+    }
+    .admin-logout-btn:hover { border-color:#ff4466; color:#ff4466; }
+
+    /* Admin main content */
+    .admin-main {
+      flex:1; padding:2.5rem 3vw; overflow-y:auto;
+    }
+    .admin-topbar {
+      display:flex; justify-content:space-between; align-items:center;
+      margin-bottom:2.5rem; flex-wrap:wrap; gap:1rem;
+    }
+    .admin-page-title {
+      font-family:var(--font-d); font-size:1.4rem; font-weight:700;
+      letter-spacing:.08em; text-transform:uppercase;
+    }
+    .admin-close-btn {
+      padding:.55rem 1.2rem; background:var(--card); border:1px solid var(--border);
+      border-radius:100px; font-size:.72rem; letter-spacing:.1em;
+      color:var(--text2); cursor:pointer; transition:all .22s; font-family:var(--font-b);
+    }
+    .admin-close-btn:hover { border-color:var(--border-glow); color:var(--text); }
+
+    /* Admin tab content */
+    .admin-tab { display:none; }
+    .admin-tab.active { display:block; }
+
+    /* Stat cards */
+    .admin-stats-grid {
+      display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr));
+      gap:1.2rem; margin-bottom:2.5rem;
+    }
+    .admin-stat-card {
+      background:var(--bg2); border:1px solid var(--border); border-radius:var(--r2);
+      padding:1.6rem; transition:border-color .3s, box-shadow .3s;
+    }
+    .admin-stat-card:hover { border-color:var(--border-glow); box-shadow:var(--glow-cyan); }
+    .admin-stat-label {
+      font-family:var(--font-m); font-size:.6rem; color:var(--text3);
+      letter-spacing:.2em; text-transform:uppercase; margin-bottom:.6rem;
+    }
+    .admin-stat-value {
+      font-family:var(--font-d); font-size:1.7rem; font-weight:700;
+      background:var(--grad); -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+      margin-bottom:.3rem;
+    }
+    .admin-stat-change {
+      font-family:var(--font-m); font-size:.62rem; color:var(--text3); letter-spacing:.08em;
+    }
+    .admin-stat-change.up { color:#22d3a5; }
+    .admin-stat-change.down { color:#ff4466; }
+
+    /* Admin tables */
+    .admin-section-head {
+      display:flex; justify-content:space-between; align-items:center;
+      margin-bottom:1.2rem; flex-wrap:wrap; gap:.8rem;
+    }
+    .admin-section-title {
+      font-family:var(--font-d); font-size:.85rem; font-weight:700;
+      letter-spacing:.12em; text-transform:uppercase;
+    }
+    .admin-table-wrap {
+      background:var(--bg2); border:1px solid var(--border); border-radius:var(--r2);
+      overflow:hidden; margin-bottom:2.5rem;
+    }
+    .admin-table { width:100%; border-collapse:collapse; }
+    .admin-table th {
+      font-family:var(--font-m); font-size:.58rem; letter-spacing:.18em;
+      text-transform:uppercase; color:var(--text3); text-align:left;
+      padding:.9rem 1.2rem; border-bottom:1px solid var(--border); background:var(--bg3);
+    }
+    .admin-table td {
+      padding:.95rem 1.2rem; font-size:.82rem; color:var(--text2);
+      border-bottom:1px solid var(--border); vertical-align:middle;
+    }
+    .admin-table tr:last-child td { border-bottom:none; }
+    .admin-table tr:hover td { background:var(--card); }
+    .admin-prod-name { color:var(--text); font-weight:600; }
+    .admin-badge {
+      display:inline-block; padding:.22rem .65rem; border-radius:100px;
+      font-family:var(--font-m); font-size:.55rem; letter-spacing:.1em; font-weight:700;
+    }
+    .badge-active { background:rgba(34,211,165,.12); color:#22d3a5; border:1px solid rgba(34,211,165,.25); }
+    .badge-low { background:rgba(255,170,0,.1); color:#ffaa00; border:1px solid rgba(255,170,0,.25); }
+    .badge-out { background:rgba(255,68,102,.1); color:#ff4466; border:1px solid rgba(255,68,102,.25); }
+    .badge-pending { background:rgba(255,170,0,.1); color:#ffaa00; border:1px solid rgba(255,170,0,.25); }
+    .badge-shipped { background:rgba(0,212,255,.1); color:var(--cyan); border:1px solid rgba(0,212,255,.25); }
+    .badge-delivered { background:rgba(34,211,165,.12); color:#22d3a5; border:1px solid rgba(34,211,165,.25); }
+    .badge-refunded { background:rgba(168,85,247,.1); color:var(--purple); border:1px solid rgba(168,85,247,.25); }
+
+    .admin-action-btns { display:flex; gap:.5rem; }
+    .admin-action-btn {
+      padding:.32rem .75rem; background:var(--card); border:1px solid var(--border);
+      border-radius:6px; font-size:.68rem; letter-spacing:.06em; cursor:pointer;
+      color:var(--text2); transition:all .2s; font-family:var(--font-b);
+    }
+    .admin-action-btn:hover { color:var(--text); border-color:var(--border-glow); }
+    .admin-action-btn.danger:hover { color:#ff4466; border-color:#ff4466; }
+    .admin-action-btn.primary { background:var(--cyan-dim); border-color:rgba(0,212,255,.3); color:var(--cyan); }
+    .admin-action-btn.primary:hover { background:var(--cyan); color:#000; border-color:var(--cyan); }
+
+    /* Add product form */
+    .admin-form-grid {
+      display:grid; grid-template-columns:1fr 1fr; gap:1.2rem; margin-bottom:1.4rem;
+    }
+    .admin-form-group { display:flex; flex-direction:column; gap:.4rem; }
+    .admin-form-group label {
+      font-family:var(--font-m); font-size:.6rem; letter-spacing:.15em;
+      text-transform:uppercase; color:var(--text3);
+    }
+    .admin-form-group input,
+    .admin-form-group select,
+    .admin-form-group textarea {
+      padding:.72rem 1rem; background:var(--bg3);
+      border:1px solid var(--border); border-radius:var(--r); color:var(--text);
+      font-size:.82rem; outline:none; transition:border-color .3s; font-family:var(--font-b);
+    }
+    .admin-form-group input:focus,
+    .admin-form-group select:focus,
+    .admin-form-group textarea:focus { border-color:var(--border-glow); }
+    .admin-form-group textarea { resize:vertical; min-height:80px; }
+    .admin-form-group select option { background:var(--bg2); }
+    .admin-collapsible { overflow:hidden; max-height:0; transition:max-height .4s var(--ease); }
+    .admin-collapsible.open { max-height:600px; }
+    .admin-add-form-wrap {
+      background:var(--bg2); border:1px solid var(--border); border-radius:var(--r2);
+      padding:2rem; margin-bottom:2rem;
+    }
+    .admin-add-title {
+      font-family:var(--font-d); font-size:.82rem; font-weight:700;
+      letter-spacing:.15em; text-transform:uppercase; margin-bottom:1.5rem;
+      color:var(--cyan);
+    }
+
+    /* Chart / revenue overview */
+    .admin-chart-wrap {
+      background:var(--bg2); border:1px solid var(--border); border-radius:var(--r2);
+      padding:1.8rem; margin-bottom:2.5rem;
+    }
+    .admin-chart-title {
+      font-family:var(--font-d); font-size:.82rem; font-weight:700;
+      letter-spacing:.15em; text-transform:uppercase; margin-bottom:1.5rem;
+    }
+    .admin-bar-chart { display:flex; align-items:flex-end; gap:.5rem; height:120px; }
+    .admin-bar-col { flex:1; display:flex; flex-direction:column; align-items:center; gap:.35rem; }
+    .admin-bar {
+      width:100%; border-radius:4px 4px 0 0;
+      background:linear-gradient(to top, rgba(0,212,255,.4), rgba(168,85,247,.4));
+      border:1px solid rgba(0,212,255,.2); transition:background .3s;
+      cursor:default; position:relative;
+    }
+    .admin-bar:hover { background:linear-gradient(to top, var(--cyan), var(--purple)); }
+    .admin-bar-label { font-family:var(--font-m); font-size:.52rem; color:var(--text3); letter-spacing:.06em; }
+
+    /* Edit modal */
+    .admin-modal-bg {
+      position:fixed; inset:0; background:rgba(0,0,0,.8); z-index:9500;
+      display:flex; align-items:center; justify-content:center;
+      opacity:0; pointer-events:none; transition:opacity .3s;
+    }
+    .admin-modal-bg.open { opacity:1; pointer-events:all; }
+    .admin-modal {
+      background:var(--bg2); border:1px solid var(--border); border-radius:var(--r2);
+      padding:2.5rem; width:90%; max-width:560px; max-height:85vh; overflow-y:auto;
+      transform:scale(.95); transition:transform .3s var(--ease);
+    }
+    .admin-modal-bg.open .admin-modal { transform:scale(1); }
+    .admin-modal-title {
+      font-family:var(--font-d); font-size:1rem; font-weight:700;
+      letter-spacing:.12em; text-transform:uppercase; margin-bottom:1.8rem; color:var(--cyan);
+    }
+
+    @media (max-width:768px) {
+      .admin-sidebar { display:none; }
+      .admin-main { padding:1.5rem; }
+      .admin-form-grid { grid-template-columns:1fr; }
+      .admin-bar-chart { height:80px; }
+    }
+
+    /* ============================================================
        RESPONSIVE
     ============================================================ */
     @media (max-width:1024px) {
@@ -872,15 +1137,256 @@
   </div>
   <div class="footer-bottom">
     <div class="footer-copy">© 2025 VOID APPAREL. ALL RIGHTS RESERVED.</div>
-    <div class="pay-icons">
-      <span class="pay-icon">VISA</span>
-      <span class="pay-icon">MC</span>
-      <span class="pay-icon">AMEX</span>
-      <span class="pay-icon">PAYPAL</span>
-      <span class="pay-icon">APPLE PAY</span>
+    <div style="display:flex;align-items:center;gap:1.2rem;">
+      <button onclick="openAdmin()" style="background:none;border:none;font-family:var(--font-m);font-size:.55rem;color:var(--text3);letter-spacing:.15em;cursor:pointer;transition:color .2s;text-transform:uppercase;" onmouseover="this.style.color='var(--cyan)'" onmouseout="this.style.color='var(--text3)'">Admin ⬡</button>
+      <div class="pay-icons">
+        <span class="pay-icon">VISA</span>
+        <span class="pay-icon">MC</span>
+        <span class="pay-icon">AMEX</span>
+        <span class="pay-icon">PAYPAL</span>
+        <span class="pay-icon">APPLE PAY</span>
+      </div>
     </div>
   </div>
 </footer>
+
+<!-- ADMIN OVERLAY -->
+<div class="admin-overlay" id="admin-overlay"></div>
+
+<!-- ADMIN PANEL -->
+<div class="admin-panel" id="admin-panel">
+
+  <!-- LOGIN SCREEN -->
+  <div class="admin-login" id="admin-login-screen">
+    <div class="admin-login-box">
+      <div class="admin-login-logo">VOID</div>
+      <div class="admin-login-sub">Admin Dashboard</div>
+      <input type="text" class="admin-input" id="admin-user-input" placeholder="Username" />
+      <input type="password" class="admin-input" id="admin-pass-input" placeholder="Password" onkeydown="if(event.key==='Enter')doAdminLogin()" />
+      <div class="admin-login-err" id="admin-login-err"></div>
+      <button class="btn-grad" style="width:100%;justify-content:center;" onclick="doAdminLogin()">Enter Dashboard →</button>
+      <p style="margin-top:1.2rem;font-family:var(--font-m);font-size:.58rem;color:var(--text3);letter-spacing:.1em;">Use: admin / void2025</p>
+    </div>
+    <button onclick="closeAdmin()" style="font-family:var(--font-m);font-size:.6rem;color:var(--text3);letter-spacing:.15em;background:none;border:none;cursor:pointer;">← EXIT</button>
+  </div>
+
+  <!-- DASHBOARD SCREEN -->
+  <div class="admin-wrap" id="admin-dashboard-screen" style="display:none;">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+      <div class="admin-sidebar-logo">VOID</div>
+      <div class="admin-sidebar-tag">Admin Dashboard</div>
+      <ul class="admin-nav">
+        <li><button class="admin-nav-btn active" onclick="switchAdminTab('dashboard',this)"><span class="admin-nav-icon">◈</span> Dashboard</button></li>
+        <li><button class="admin-nav-btn" onclick="switchAdminTab('products',this)"><span class="admin-nav-icon">◎</span> Products</button></li>
+        <li><button class="admin-nav-btn" onclick="switchAdminTab('orders',this)"><span class="admin-nav-icon">◇</span> Orders</button></li>
+        <li><button class="admin-nav-btn" onclick="switchAdminTab('customers',this)"><span class="admin-nav-icon">◉</span> Customers</button></li>
+      </ul>
+      <div class="admin-sidebar-foot">
+        <button class="admin-logout-btn" onclick="adminLogout()">Log Out</button>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="admin-main">
+      <div class="admin-topbar">
+        <div class="admin-page-title" id="admin-page-title">Dashboard</div>
+        <button class="admin-close-btn" onclick="closeAdmin()">✕ Close Panel</button>
+      </div>
+
+      <!-- DASHBOARD TAB -->
+      <div class="admin-tab active" id="tab-dashboard">
+        <div class="admin-stats-grid">
+          <div class="admin-stat-card">
+            <div class="admin-stat-label">Total Revenue</div>
+            <div class="admin-stat-value">$84,320</div>
+            <div class="admin-stat-change up">↑ 12.4% this month</div>
+          </div>
+          <div class="admin-stat-card">
+            <div class="admin-stat-label">Orders</div>
+            <div class="admin-stat-value" id="admin-order-count">247</div>
+            <div class="admin-stat-change up">↑ 8.1% this month</div>
+          </div>
+          <div class="admin-stat-card">
+            <div class="admin-stat-label">Customers</div>
+            <div class="admin-stat-value">12,480</div>
+            <div class="admin-stat-change up">↑ 5.3% this month</div>
+          </div>
+          <div class="admin-stat-card">
+            <div class="admin-stat-label">Avg. Order Value</div>
+            <div class="admin-stat-value">$341</div>
+            <div class="admin-stat-change down">↓ 2.1% this month</div>
+          </div>
+        </div>
+
+        <div class="admin-chart-wrap">
+          <div class="admin-chart-title">Revenue — Last 7 Months</div>
+          <div class="admin-bar-chart" id="admin-bar-chart"></div>
+        </div>
+
+        <div class="admin-section-head">
+          <div class="admin-section-title">Recent Orders</div>
+        </div>
+        <div class="admin-table-wrap">
+          <table class="admin-table" id="dashboard-recent-orders"></table>
+        </div>
+      </div>
+
+      <!-- PRODUCTS TAB -->
+      <div class="admin-tab" id="tab-products">
+        <div class="admin-section-head">
+          <div class="admin-section-title">Product Catalog</div>
+          <button class="admin-action-btn primary" onclick="toggleAddProductForm()">+ Add Product</button>
+        </div>
+
+        <!-- Add product form (collapsible) -->
+        <div class="admin-collapsible" id="add-product-collapsible">
+          <div class="admin-add-form-wrap">
+            <div class="admin-add-title">New Product</div>
+            <div class="admin-form-grid">
+              <div class="admin-form-group">
+                <label>Product Name</label>
+                <input type="text" id="ap-name" placeholder="e.g. ECHO JACKET" />
+              </div>
+              <div class="admin-form-group">
+                <label>Price ($)</label>
+                <input type="number" id="ap-price" placeholder="299" />
+              </div>
+              <div class="admin-form-group">
+                <label>Original Price ($)</label>
+                <input type="number" id="ap-orig" placeholder="Leave blank if no discount" />
+              </div>
+              <div class="admin-form-group">
+                <label>Category</label>
+                <select id="ap-cat">
+                  <option value="streetwear">Streetwear</option>
+                  <option value="men">Men</option>
+                  <option value="women">Women</option>
+                  <option value="accessories">Accessories</option>
+                </select>
+              </div>
+              <div class="admin-form-group">
+                <label>Badge</label>
+                <input type="text" id="ap-badge" placeholder="NEW DROP, LIMITED, SALE…" />
+              </div>
+              <div class="admin-form-group">
+                <label>Emoji Icon</label>
+                <input type="text" id="ap-emoji" placeholder="🧥" />
+              </div>
+            </div>
+            <div class="admin-form-group" style="margin-bottom:1.2rem;">
+              <label>Description</label>
+              <textarea id="ap-desc" placeholder="Product description…"></textarea>
+            </div>
+            <div style="display:flex;gap:.85rem;flex-wrap:wrap;">
+              <button class="btn-grad" onclick="addNewProduct()">Save Product →</button>
+              <button class="admin-action-btn" onclick="toggleAddProductForm()">Cancel</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="admin-table-wrap">
+          <table class="admin-table" id="admin-products-table"></table>
+        </div>
+      </div>
+
+      <!-- ORDERS TAB -->
+      <div class="admin-tab" id="tab-orders">
+        <div class="admin-section-head">
+          <div class="admin-section-title">All Orders</div>
+          <div style="display:flex;gap:.6rem;flex-wrap:wrap;">
+            <button class="admin-action-btn active" onclick="filterOrders('all',this)" id="ord-filter-all">All</button>
+            <button class="admin-action-btn" onclick="filterOrders('pending',this)">Pending</button>
+            <button class="admin-action-btn" onclick="filterOrders('shipped',this)">Shipped</button>
+            <button class="admin-action-btn" onclick="filterOrders('delivered',this)">Delivered</button>
+          </div>
+        </div>
+        <div class="admin-table-wrap">
+          <table class="admin-table" id="admin-orders-table"></table>
+        </div>
+      </div>
+
+      <!-- CUSTOMERS TAB -->
+      <div class="admin-tab" id="tab-customers">
+        <div class="admin-section-head">
+          <div class="admin-section-title">Customer Overview</div>
+        </div>
+        <div class="admin-stats-grid" style="margin-bottom:2rem;">
+          <div class="admin-stat-card">
+            <div class="admin-stat-label">Total Customers</div>
+            <div class="admin-stat-value">12,480</div>
+            <div class="admin-stat-change up">↑ 5.3%</div>
+          </div>
+          <div class="admin-stat-card">
+            <div class="admin-stat-label">Repeat Buyers</div>
+            <div class="admin-stat-value">3,841</div>
+            <div class="admin-stat-change up">↑ 18.7%</div>
+          </div>
+          <div class="admin-stat-card">
+            <div class="admin-stat-label">Newsletter Subs</div>
+            <div class="admin-stat-value">8,204</div>
+            <div class="admin-stat-change up">↑ 9.2%</div>
+          </div>
+          <div class="admin-stat-card">
+            <div class="admin-stat-label">Avg. LTV</div>
+            <div class="admin-stat-value">$892</div>
+            <div class="admin-stat-change up">↑ 14.1%</div>
+          </div>
+        </div>
+        <div class="admin-table-wrap">
+          <table class="admin-table" id="admin-customers-table"></table>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ADMIN EDIT MODAL -->
+<div class="admin-modal-bg" id="admin-edit-modal">
+  <div class="admin-modal">
+    <div class="admin-modal-title" id="admin-modal-title">Edit Product</div>
+    <div class="admin-form-grid">
+      <div class="admin-form-group">
+        <label>Product Name</label>
+        <input type="text" id="ep-name" />
+      </div>
+      <div class="admin-form-group">
+        <label>Price ($)</label>
+        <input type="number" id="ep-price" />
+      </div>
+      <div class="admin-form-group">
+        <label>Original Price ($)</label>
+        <input type="number" id="ep-orig" placeholder="Leave blank if none" />
+      </div>
+      <div class="admin-form-group">
+        <label>Category</label>
+        <select id="ep-cat">
+          <option value="streetwear">Streetwear</option>
+          <option value="men">Men</option>
+          <option value="women">Women</option>
+          <option value="accessories">Accessories</option>
+        </select>
+      </div>
+      <div class="admin-form-group">
+        <label>Badge</label>
+        <input type="text" id="ep-badge" />
+      </div>
+      <div class="admin-form-group">
+        <label>Emoji Icon</label>
+        <input type="text" id="ep-emoji" />
+      </div>
+    </div>
+    <div class="admin-form-group" style="margin-bottom:1.4rem;">
+      <label>Description</label>
+      <textarea id="ep-desc"></textarea>
+    </div>
+    <div style="display:flex;gap:.85rem;">
+      <button class="btn-grad" onclick="saveEditProduct()">Save Changes →</button>
+      <button class="admin-action-btn" onclick="closeEditModal()">Cancel</button>
+    </div>
+  </div>
+</div>
 
 <!-- CART OVERLAY + PANEL -->
 <div class="cart-overlay" id="cart-overlay" onclick="toggleCart()"></div>
@@ -1789,8 +2295,417 @@ document.addEventListener('keydown', e => {
     if (document.getElementById('cart-panel').classList.contains('open')) toggleCart();
     if (document.getElementById('checkout-page').classList.contains('open')) closeCheckout();
     if (document.getElementById('mobile-menu').classList.contains('open')) closeMobileMenu();
+    closeEditModal();
   }
 });
+
+/* ================================================================
+   ADMIN — DATA
+================================================================ */
+let adminLoggedIn = false;
+let adminEditingId = null;
+let adminCurrentFilter = 'all';
+
+const ADMIN_ORDERS = [
+  { id:'#VO-8821', customer:'Marcus W.',    email:'marcus@void.co',   product:'PHANTOM JACKET',  amount:459, status:'delivered', date:'May 07, 2026' },
+  { id:'#VO-8820', customer:'Yuki T.',      email:'yuki@frames.jp',   product:'NEURAL CARGO',    amount:195, status:'shipped',   date:'May 07, 2026' },
+  { id:'#VO-8819', customer:'Sofia R.',     email:'sofia@designs.com', product:'AURORA COAT',    amount:689, status:'pending',   date:'May 06, 2026' },
+  { id:'#VO-8818', customer:'Devon K.',     email:'devon@kc.io',       product:'VOID HOODIE',    amount:289, status:'delivered', date:'May 06, 2026' },
+  { id:'#VO-8817', customer:'Priya N.',     email:'priya@mode.in',     product:'CIPHER BAG',     amount:425, status:'shipped',   date:'May 05, 2026' },
+  { id:'#VO-8816', customer:'James L.',     email:'james@larc.co',     product:'SIGNAL TEE',     amount:89,  status:'delivered', date:'May 05, 2026' },
+  { id:'#VO-8815', customer:'Aria S.',      email:'aria@void.co',      product:'VOID DRESS',     amount:345, status:'pending',   date:'May 04, 2026' },
+  { id:'#VO-8814', customer:'Noah P.',      email:'noah@pixel.com',    product:'STEALTH CAP',    amount:65,  status:'refunded',  date:'May 03, 2026' },
+  { id:'#VO-8813', customer:'Cleo M.',      email:'cleo@mode.fr',      product:'VOID HOODIE',    amount:289, status:'delivered', date:'May 03, 2026' },
+  { id:'#VO-8812', customer:'Riku A.',      email:'riku@art.jp',       product:'PHANTOM JACKET', amount:459, status:'shipped',   date:'May 02, 2026' },
+];
+
+const ADMIN_CUSTOMERS = [
+  { name:'Marcus W.',  email:'marcus@void.co',   orders:7,  spent:2840, joined:'Jan 2024', status:'VIP'    },
+  { name:'Yuki T.',    email:'yuki@frames.jp',   orders:4,  spent:1380, joined:'Mar 2024', status:'Active' },
+  { name:'Sofia R.',   email:'sofia@designs.com',orders:12, spent:5620, joined:'Nov 2023', status:'VIP'    },
+  { name:'Devon K.',   email:'devon@kc.io',       orders:3,  spent: 873, joined:'Apr 2025', status:'Active' },
+  { name:'Priya N.',   email:'priya@mode.in',     orders:2,  spent: 514, joined:'Jul 2025', status:'Active' },
+  { name:'James L.',   email:'james@larc.co',     orders:8,  spent:2380, joined:'Feb 2024', status:'VIP'    },
+  { name:'Aria S.',    email:'aria@void.co',      orders:1,  spent: 345, joined:'Apr 2026', status:'New'    },
+  { name:'Noah P.',    email:'noah@pixel.com',    orders:1,  spent:   0, joined:'May 2026', status:'New'    },
+];
+
+const ADMIN_STOCK = { 1:42, 2:8, 3:95, 4:31, 5:120, 6:5, 7:67, 8:19 };
+
+const REVENUE_DATA = [
+  { month:'Nov', value:48 },
+  { month:'Dec', value:92 },
+  { month:'Jan', value:63 },
+  { month:'Feb', value:71 },
+  { month:'Mar', value:84 },
+  { month:'Apr', value:78 },
+  { month:'May', value:100 },
+];
+
+/* ================================================================
+   ADMIN — OPEN / CLOSE / LOGIN
+================================================================ */
+function openAdmin() {
+  document.getElementById('admin-overlay').classList.add('open');
+  document.getElementById('admin-panel').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  if (!adminLoggedIn) {
+    document.getElementById('admin-login-screen').style.display = 'flex';
+    document.getElementById('admin-dashboard-screen').style.display = 'none';
+  }
+}
+
+function closeAdmin() {
+  document.getElementById('admin-overlay').classList.remove('open');
+  document.getElementById('admin-panel').classList.remove('open');
+  document.body.style.overflow = '';
+  document.getElementById('admin-login-err').textContent = '';
+}
+
+function doAdminLogin() {
+  const user = document.getElementById('admin-user-input').value.trim();
+  const pass = document.getElementById('admin-pass-input').value.trim();
+  const err  = document.getElementById('admin-login-err');
+
+  if (user === 'admin' && pass === 'void2025') {
+    adminLoggedIn = true;
+    err.textContent = '';
+    document.getElementById('admin-login-screen').style.display = 'none';
+    document.getElementById('admin-dashboard-screen').style.display = 'flex';
+    initAdminDashboard();
+  } else {
+    err.textContent = 'Invalid credentials. Try again.';
+    document.getElementById('admin-pass-input').value = '';
+  }
+}
+
+function adminLogout() {
+  adminLoggedIn = false;
+  document.getElementById('admin-user-input').value = '';
+  document.getElementById('admin-pass-input').value = '';
+  document.getElementById('admin-login-screen').style.display = 'flex';
+  document.getElementById('admin-dashboard-screen').style.display = 'none';
+  switchAdminTab('dashboard', document.querySelector('.admin-nav-btn'));
+}
+
+/* ================================================================
+   ADMIN — TAB SWITCHING
+================================================================ */
+function switchAdminTab(tab, btn) {
+  // Hide all tabs
+  document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.admin-nav-btn').forEach(b => b.classList.remove('active'));
+
+  document.getElementById('tab-' + tab).classList.add('active');
+  btn.classList.add('active');
+
+  const titles = { dashboard:'Dashboard', products:'Products', orders:'Orders', customers:'Customers' };
+  document.getElementById('admin-page-title').textContent = titles[tab] || tab;
+
+  // Render tab content
+  if (tab === 'products')  renderAdminProducts();
+  if (tab === 'orders')    renderAdminOrders('all');
+  if (tab === 'customers') renderAdminCustomers();
+}
+
+/* ================================================================
+   ADMIN — INIT DASHBOARD
+================================================================ */
+function initAdminDashboard() {
+  renderAdminBarChart();
+  renderDashboardRecentOrders();
+  document.getElementById('admin-order-count').textContent = ADMIN_ORDERS.length + 239;
+}
+
+/* ================================================================
+   ADMIN — BAR CHART
+================================================================ */
+function renderAdminBarChart() {
+  const max = Math.max(...REVENUE_DATA.map(d => d.value));
+  const wrap = document.getElementById('admin-bar-chart');
+  wrap.innerHTML = REVENUE_DATA.map(d => {
+    const h = Math.round((d.value / max) * 100);
+    return `
+      <div class="admin-bar-col">
+        <div class="admin-bar" style="height:${h}%" title="$${Math.round(d.value * 843)}"></div>
+        <div class="admin-bar-label">${d.month}</div>
+      </div>`;
+  }).join('');
+}
+
+/* ================================================================
+   ADMIN — RECENT ORDERS (dashboard)
+================================================================ */
+function renderDashboardRecentOrders() {
+  const table = document.getElementById('dashboard-recent-orders');
+  const recent = ADMIN_ORDERS.slice(0, 6);
+  table.innerHTML = `
+    <thead>
+      <tr>
+        <th>Order ID</th>
+        <th>Customer</th>
+        <th>Product</th>
+        <th>Amount</th>
+        <th>Status</th>
+        <th>Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${recent.map(o => `
+        <tr>
+          <td style="font-family:var(--font-m);font-size:.72rem;color:var(--cyan);">${o.id}</td>
+          <td class="admin-prod-name">${o.customer}</td>
+          <td>${o.product}</td>
+          <td style="font-family:var(--font-m);">$${o.amount}</td>
+          <td><span class="admin-badge badge-${o.status}">${o.status.toUpperCase()}</span></td>
+          <td>${o.date}</td>
+        </tr>`).join('')}
+    </tbody>`;
+}
+
+/* ================================================================
+   ADMIN — PRODUCTS TABLE
+================================================================ */
+function renderAdminProducts() {
+  const table = document.getElementById('admin-products-table');
+  const stockBadge = (id) => {
+    const s = ADMIN_STOCK[id] || 0;
+    if (s === 0) return `<span class="admin-badge badge-out">OUT OF STOCK</span>`;
+    if (s < 10)  return `<span class="admin-badge badge-low">LOW — ${s}</span>`;
+    return `<span class="admin-badge badge-active">IN STOCK — ${s}</span>`;
+  };
+  table.innerHTML = `
+    <thead>
+      <tr>
+        <th>Product</th>
+        <th>Category</th>
+        <th>Price</th>
+        <th>Badge</th>
+        <th>Stock</th>
+        <th>Rating</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${PRODUCTS.map(p => `
+        <tr>
+          <td>
+            <div style="display:flex;align-items:center;gap:.75rem;">
+              <div style="width:36px;height:36px;border-radius:8px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:1.1rem;">${p.emoji}</div>
+              <span class="admin-prod-name">${p.name}</span>
+            </div>
+          </td>
+          <td style="text-transform:capitalize;">${p.cat}</td>
+          <td style="font-family:var(--font-m);">
+            $${p.price}
+            ${p.orig ? `<span style="color:var(--text3);text-decoration:line-through;margin-left:.35rem;font-size:.72rem;">$${p.orig}</span>` : ''}
+          </td>
+          <td>${p.badge ? `<span class="admin-badge badge-active">${p.badge}</span>` : '<span style="color:var(--text3);">—</span>'}</td>
+          <td>${stockBadge(p.id)}</td>
+          <td style="font-family:var(--font-m);">${p.rating} ★ <span style="color:var(--text3);">(${p.reviews})</span></td>
+          <td>
+            <div class="admin-action-btns">
+              <button class="admin-action-btn primary" onclick="openEditProduct(${p.id})">Edit</button>
+              <button class="admin-action-btn danger" onclick="deleteProduct(${p.id})">Delete</button>
+            </div>
+          </td>
+        </tr>`).join('')}
+    </tbody>`;
+}
+
+/* ================================================================
+   ADMIN — ADD PRODUCT
+================================================================ */
+let addFormOpen = false;
+function toggleAddProductForm() {
+  addFormOpen = !addFormOpen;
+  document.getElementById('add-product-collapsible').classList.toggle('open', addFormOpen);
+}
+
+function addNewProduct() {
+  const name  = document.getElementById('ap-name').value.trim();
+  const price = parseFloat(document.getElementById('ap-price').value);
+  const orig  = parseFloat(document.getElementById('ap-orig').value) || null;
+  const cat   = document.getElementById('ap-cat').value;
+  const badge = document.getElementById('ap-badge').value.trim() || null;
+  const emoji = document.getElementById('ap-emoji').value.trim() || '🧥';
+  const desc  = document.getElementById('ap-desc').value.trim();
+
+  if (!name || !price) { showToast('Name and price are required'); return; }
+
+  const bgOptions = ['pb1','pb2','pb3','pb4','pb5','pb6','pb7','pb8'];
+  const newId = Math.max(...PRODUCTS.map(p => p.id)) + 1;
+
+  PRODUCTS.push({
+    id: newId, name: name.toUpperCase(), price, orig, cat, badge,
+    rating: 5.0, reviews: 0, emoji,
+    bg: bgOptions[newId % bgOptions.length],
+    colors: ['#111827'], sizes: ['XS','S','M','L','XL'],
+    desc: desc || 'A new VOID essential.',
+  });
+
+  ADMIN_STOCK[newId] = 50;
+
+  // Reset form
+  ['ap-name','ap-price','ap-orig','ap-badge','ap-emoji','ap-desc'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  toggleAddProductForm();
+  renderAdminProducts();
+  renderProducts(); // refresh storefront
+  showToast('Product added ✦');
+}
+
+/* ================================================================
+   ADMIN — EDIT PRODUCT
+================================================================ */
+function openEditProduct(id) {
+  const p = PRODUCTS.find(x => x.id === id);
+  if (!p) return;
+  adminEditingId = id;
+  document.getElementById('ep-name').value  = p.name;
+  document.getElementById('ep-price').value = p.price;
+  document.getElementById('ep-orig').value  = p.orig || '';
+  document.getElementById('ep-cat').value   = p.cat;
+  document.getElementById('ep-badge').value = p.badge || '';
+  document.getElementById('ep-emoji').value = p.emoji;
+  document.getElementById('ep-desc').value  = p.desc;
+  document.getElementById('admin-modal-title').textContent = 'Edit — ' + p.name;
+  document.getElementById('admin-edit-modal').classList.add('open');
+}
+
+function closeEditModal() {
+  document.getElementById('admin-edit-modal').classList.remove('open');
+  adminEditingId = null;
+}
+
+function saveEditProduct() {
+  if (!adminEditingId) return;
+  const p = PRODUCTS.find(x => x.id === adminEditingId);
+  if (!p) return;
+
+  p.name  = document.getElementById('ep-name').value.trim().toUpperCase() || p.name;
+  p.price = parseFloat(document.getElementById('ep-price').value) || p.price;
+  p.orig  = parseFloat(document.getElementById('ep-orig').value) || null;
+  p.cat   = document.getElementById('ep-cat').value;
+  p.badge = document.getElementById('ep-badge').value.trim() || null;
+  p.emoji = document.getElementById('ep-emoji').value.trim() || p.emoji;
+  p.desc  = document.getElementById('ep-desc').value.trim() || p.desc;
+
+  closeEditModal();
+  renderAdminProducts();
+  renderProducts();
+  showToast('Product updated ✦');
+}
+
+/* ================================================================
+   ADMIN — DELETE PRODUCT
+================================================================ */
+function deleteProduct(id) {
+  const p = PRODUCTS.find(x => x.id === id);
+  if (!p) return;
+  if (!confirm(`Delete "${p.name}"? This cannot be undone.`)) return;
+  const idx = PRODUCTS.indexOf(p);
+  PRODUCTS.splice(idx, 1);
+  renderAdminProducts();
+  renderProducts();
+  showToast('Product deleted');
+}
+
+/* ================================================================
+   ADMIN — ORDERS TABLE
+================================================================ */
+function renderAdminOrders(filter) {
+  adminCurrentFilter = filter;
+  const orders = filter === 'all'
+    ? ADMIN_ORDERS
+    : ADMIN_ORDERS.filter(o => o.status === filter);
+
+  const table = document.getElementById('admin-orders-table');
+  table.innerHTML = `
+    <thead>
+      <tr>
+        <th>Order ID</th>
+        <th>Customer</th>
+        <th>Email</th>
+        <th>Product</th>
+        <th>Amount</th>
+        <th>Status</th>
+        <th>Date</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${orders.length === 0
+        ? `<tr><td colspan="8" style="text-align:center;padding:2.5rem;color:var(--text3);font-family:var(--font-m);font-size:.7rem;letter-spacing:.12em;">NO ORDERS FOUND</td></tr>`
+        : orders.map(o => `
+          <tr>
+            <td style="font-family:var(--font-m);font-size:.72rem;color:var(--cyan);">${o.id}</td>
+            <td class="admin-prod-name">${o.customer}</td>
+            <td style="color:var(--text3);font-size:.78rem;">${o.email}</td>
+            <td>${o.product}</td>
+            <td style="font-family:var(--font-m);">$${o.amount}</td>
+            <td><span class="admin-badge badge-${o.status}">${o.status.toUpperCase()}</span></td>
+            <td style="color:var(--text3);font-size:.78rem;">${o.date}</td>
+            <td>
+              <div class="admin-action-btns">
+                ${o.status === 'pending'  ? `<button class="admin-action-btn primary" onclick="updateOrderStatus('${o.id}','shipped')">Mark Shipped</button>` : ''}
+                ${o.status === 'shipped'  ? `<button class="admin-action-btn primary" onclick="updateOrderStatus('${o.id}','delivered')">Mark Delivered</button>` : ''}
+                ${o.status !== 'refunded' ? `<button class="admin-action-btn danger" onclick="updateOrderStatus('${o.id}','refunded')">Refund</button>` : ''}
+              </div>
+            </td>
+          </tr>`).join('')}
+    </tbody>`;
+}
+
+function filterOrders(filter, btn) {
+  document.querySelectorAll('#tab-orders .admin-action-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderAdminOrders(filter);
+}
+
+function updateOrderStatus(orderId, newStatus) {
+  const order = ADMIN_ORDERS.find(o => o.id === orderId);
+  if (order) {
+    order.status = newStatus;
+    renderAdminOrders(adminCurrentFilter);
+    renderDashboardRecentOrders();
+    showToast(`Order ${orderId} → ${newStatus} ✦`);
+  }
+}
+
+/* ================================================================
+   ADMIN — CUSTOMERS TABLE
+================================================================ */
+function renderAdminCustomers() {
+  const table = document.getElementById('admin-customers-table');
+  const statusBadge = (s) => {
+    const map = { VIP:'badge-delivered', Active:'badge-shipped', New:'badge-pending' };
+    return `<span class="admin-badge ${map[s] || 'badge-pending'}">${s.toUpperCase()}</span>`;
+  };
+  table.innerHTML = `
+    <thead>
+      <tr>
+        <th>Customer</th>
+        <th>Email</th>
+        <th>Orders</th>
+        <th>Total Spent</th>
+        <th>Joined</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${ADMIN_CUSTOMERS.map(c => `
+        <tr>
+          <td class="admin-prod-name">${c.name}</td>
+          <td style="color:var(--text3);font-size:.78rem;">${c.email}</td>
+          <td style="font-family:var(--font-m);">${c.orders}</td>
+          <td style="font-family:var(--font-m);color:var(--cyan);">$${c.spent.toLocaleString()}</td>
+          <td style="color:var(--text3);font-size:.78rem;">${c.joined}</td>
+          <td>${statusBadge(c.status)}</td>
+        </tr>`).join('')}
+    </tbody>`;
+}
 </script>
 </body>
 </html>
